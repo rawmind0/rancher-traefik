@@ -4,6 +4,6 @@ dest = "/opt/traefik/etc/rules.toml"
 owner = "traefik"
 mode = "0644"
 keys = [
-  "/",
+  "/services",
 ]
 

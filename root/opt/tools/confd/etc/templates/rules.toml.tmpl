@@ -1,15 +1,16 @@
-{{$stack_name := getv (printf "/self/stack/name")}}{{range $i, $service_name := ls (printf "/self/stack/services")}}
-[backends]
+[backends]{{range $i, $service_name := ls "/services"}}
+{{if exists (printf "/services/%s/labels/traefik.enable" $service_name)}}{{$traefik_enable := getv (printf "/services/%s/labels/traefik.enable" $service_name)}}{{if eq $traefik_enable "true"}}
   [backends.{{$service_name}}]
     [backends.{{$service_name}}.circuitbreaker]
       expression = "NetworkErrorRatio() > 0.5"
     [backends.{{$service_name}}.LoadBalancer]
-      method = "drr"
-  {{range $i, $container := ls (printf "/self/stack/services/%s/containers" $service_name)}}[backends.{{$service_name}}.servers.{{getv (printf "/self/stack/services/%s/containers/%s/name" $service_name $container)}}]
-    url = "http://{{getv (printf "/self/stack/services/%s/containers/%s/primary_ip" $service_name $container)}}:80"
-    weight = 10
-  {{end}}
-[frontends]
-  [frontends.{{$stack_name}}]
+      method = "drr" {{range $i2, $container := ls (printf "/services/%s/containers" $service_name)}}
+    [backends.{{$service_name}}.servers.{{getv (printf "/services/%s/containers/%s/name" $service_name $container)}}]
+    url = "http://{{getv (printf "/services/%s/containers/%s/primary_ip" $service_name $container)}}:{{getv (printf "/services/%s/labels/traefik.port" $service_name)}}"
+    weight = 10{{end}}{{end}}{{end}}{{end}}
+{{range $i, $service_name := ls (printf "/services")}}{{if eq $i 0}}[frontends]{{end}}
+{{if exists (printf "/services/%s/labels/traefik.enable" $service_name)}}{{$traefik_enable := getv (printf "/services/%s/labels/traefik.enable" $service_name)}}{{if eq $traefik_enable "true"}}
+  [frontends.{{$service_name}}]
   backend = "{{$service_name}}"
-{{end}}
+    [frontends.{{$service_name}}.routes.test_1]
+    rule = "Host:{{$service_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{end}}{{end}}{{end}}
