@@ -10,4 +10,4 @@ ENV SERVICE_NAME=traefik \
 
 # Add service files
 ADD root /
-RUN chown -R ${SERVICE_UID}:${SERVICE_GID} /opt/tools
+CMD ["chown", "-R", "${SERVICE_UID}:${SERVICE_GID}", "/opt/tools"]
