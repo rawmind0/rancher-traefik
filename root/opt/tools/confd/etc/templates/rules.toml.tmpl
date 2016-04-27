@@ -1,0 +1,15 @@
+{{$stack_name := getv (printf "/self/stack/name")}}{{range $i, $service_name := ls (printf "/self/stack/services")}}
+[backends]
+  [backends.{{$service_name}}]
+    [backends.{{$service_name}}.circuitbreaker]
+      expression = "NetworkErrorRatio() > 0.5"
+    [backends.{{$service_name}}.LoadBalancer]
+      method = "drr"
+  {{range $i, $container := ls (printf "/self/stack/services/%s/containers" $service_name)}}[backends.{{$service_name}}.servers.{{getv (printf "/self/stack/services/%s/containers/%s/name" $service_name $container)}}]
+    url = "http://{{getv (printf "/self/stack/services/%s/containers/%s/primary_ip" $service_name $container)}}:80"
+    weight = 10
+  {{end}}
+[frontends]
+  [frontends.{{$stack_name}}]
+  backend = "{{$service_name}}"
+{{end}}
