@@ -14,4 +14,4 @@
   [frontends.{{$service_name}}]
   backend = "{{$service_name}}"
     [frontends.{{$service_name}}.routes.test_1]
-    rule = "Host:{{$service_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{end}}{{end}}{{end}}
+    rule = "Host:{{$traefik_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{end}}{{end}}{{end}}
