@@ -5,9 +5,10 @@
       expression = "NetworkErrorRatio() > 0.5"
     [backends.{{$service_name}}.LoadBalancer]
       method = "drr" {{range $i2, $container := ls (printf "/services/%s/containers" $service_name)}}
+      {{$back_status := getv (printf "/services/%s/containers/%s/health_state" $service_name $container)}}{{if eq $back_status "healthy"}}
     [backends.{{$service_name}}.servers.{{getv (printf "/services/%s/containers/%s/name" $service_name $container)}}]
     url = "http://{{getv (printf "/services/%s/containers/%s/primary_ip" $service_name $container)}}:{{getv (printf "/services/%s/labels/traefik.port" $service_name)}}"
-    weight = 10{{end}}{{end}}{{end}}{{end}}
+    weight = 10{{end}}{{end}}{{end}}{{end}}{{end}}
 {{range $i, $service_name := ls (printf "/services")}}{{if eq $i 0}}[frontends]{{end}}
 {{if exists (printf "/services/%s/labels/traefik.enable" $service_name)}}{{$traefik_enable := getv (printf "/services/%s/labels/traefik.enable" $service_name)}}{{if eq $traefik_enable "true"}}
 {{if exists (printf "/services/%s/labels/traefik.name" $service_name)}}{{$traefik_name := getv (printf "/services/%s/labels/traefik.name" $service_name)}}
