@@ -18,6 +18,7 @@
     rule = "Host:{{$traefik_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{else}}
   [frontends.{{$service_name}}]
   backend = "{{$service_name}}"
+  passHostHeader = true
     [frontends.{{$service_name}}.routes.test_1]
     rule = "Host:{{$service_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{end}}
 {{end}}{{end}}{{end}}
