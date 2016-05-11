@@ -12,8 +12,9 @@
 {{range $i, $service_name := ls (printf "/services")}}{{if eq $i 0}}[frontends]{{end}}
 {{if exists (printf "/services/%s/labels/traefik.enable" $service_name)}}{{$traefik_enable := getv (printf "/services/%s/labels/traefik.enable" $service_name)}}{{if eq $traefik_enable "true"}}
 {{if exists (printf "/services/%s/labels/traefik.name" $service_name)}}{{$traefik_name := getv (printf "/services/%s/labels/traefik.name" $service_name)}}
-    [frontends.{{$service_name}}]
+  [frontends.{{$service_name}}]
   backend = "{{$service_name}}"
+  passHostHeader = true
     [frontends.{{$service_name}}.routes.test_1]
     rule = "Host:{{$traefik_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{else}}
   [frontends.{{$service_name}}]
