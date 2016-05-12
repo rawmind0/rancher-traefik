@@ -24,7 +24,6 @@ This image has to be run as a sidekick of [rawmind/alpine-traefik][alpine-traefi
 Traefik labels, has to be created in your service, in order to get included in traefik dynamic config.
 
 - traefik.enable = <true | false> #Controls if you want to publish or not the service
-- traefik.name = <Host name to route rule>
 - traefik.domain	= <Domain name to route rule>
 - traefik.port = <port to expose throught traefik>
 
