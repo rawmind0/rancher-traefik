@@ -1,25 +1,18 @@
-[backends]{{range $i, $service_name := ls "/services"}}
-{{if exists (printf "/services/%s/labels/traefik.enable" $service_name)}}{{$traefik_enable := getv (printf "/services/%s/labels/traefik.enable" $service_name)}}{{if eq $traefik_enable "true"}}
-  [backends.{{$service_name}}]
-    [backends.{{$service_name}}.circuitbreaker]
+[backends]{{range $s, $stack_name := ls "/stacks"}}{{range $i, $service_name := ls (printf "/stacks/%s/services" $stack_name)}}{{if exists (printf "/stacks/%s/services/%s/labels/traefik.enable" $stack_name $service_name)}}{{$traefik_enable := getv (printf "/stacks/%s/services/%s/labels/traefik.enable" $stack_name $service_name)}}{{if eq $traefik_enable "true"}}
+  [backends.{{$service_name}}__{{$stack_name}}]
+    [backends.{{$service_name}}__{{$stack_name}}.circuitbreaker]
       expression = "NetworkErrorRatio() > 0.5"
-    [backends.{{$service_name}}.LoadBalancer]
-      method = "drr" {{range $i2, $container := ls (printf "/services/%s/containers" $service_name)}}
-      {{$back_status := getv (printf "/services/%s/containers/%s/health_state" $service_name $container)}}{{if eq $back_status "healthy"}}
-    [backends.{{$service_name}}.servers.{{getv (printf "/services/%s/containers/%s/name" $service_name $container)}}]
-    url = "http://{{getv (printf "/services/%s/containers/%s/primary_ip" $service_name $container)}}:{{getv (printf "/services/%s/labels/traefik.port" $service_name)}}"
-    weight = 10{{end}}{{end}}{{end}}{{end}}{{end}}
-{{range $i, $service_name := ls (printf "/services")}}{{if eq $i 0}}[frontends]{{end}}
-{{if exists (printf "/services/%s/labels/traefik.enable" $service_name)}}{{$traefik_enable := getv (printf "/services/%s/labels/traefik.enable" $service_name)}}{{if eq $traefik_enable "true"}}
-{{if exists (printf "/services/%s/labels/traefik.name" $service_name)}}{{$traefik_name := getv (printf "/services/%s/labels/traefik.name" $service_name)}}
-  [frontends.{{$service_name}}]
-  backend = "{{$service_name}}"
+    [backends.{{$service_name}}__{{$stack_name}}.LoadBalancer]
+      method = "drr" 
+      {{range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name)}}
+      {{$back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container)}}{{if eq $back_status "healthy"}}
+    [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
+    url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}:{{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}"
+    weight = 0{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}
+[frontends]{{range $s, $stack_name := ls "/stacks"}}{{range $i, $service_name := ls (printf "/stacks/%s/services" $stack_name)}}{{if exists (printf "/stacks/%s/services/%s/labels/traefik.enable" $stack_name $service_name)}}{{$traefik_enable := getv (printf "/stacks/%s/services/%s/labels/traefik.enable" $stack_name $service_name)}}{{if eq $traefik_enable "true"}}
+  [frontends.{{$service_name}}__{{$stack_name}}]
+  backend = "{{$service_name}}__{{$stack_name}}"
   passHostHeader = true
-    [frontends.{{$service_name}}.routes.test_1]
-    rule = "Host:{{$traefik_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{else}}
-  [frontends.{{$service_name}}]
-  backend = "{{$service_name}}"
-  passHostHeader = true
-    [frontends.{{$service_name}}.routes.test_1]
-    rule = "Host:{{$service_name}}.{{getv (printf "/services/%s/labels/traefik.domain" $service_name)}}"{{end}}
-{{end}}{{end}}{{end}}
+    [frontends.{{$service_name}}__{{$stack_name}}.routes.service]
+    rule = "Host:{{$service_name}}.{{$stack_name}}.{{getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)}}"
+{{end}}{{end}}{{end}}{{end}}
