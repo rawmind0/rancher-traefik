@@ -23,9 +23,12 @@ This image has to be run as a sidekick of [rawmind/alpine-traefik][alpine-traefi
 
 Traefik labels, has to be created in your service, in order to get included in traefik dynamic config.
 
-- traefik.enable = <true | false> #Controls if you want to publish or not the service
-- traefik.domain	= <Domain name to route rule>
-- traefik.port = <port to expose throught traefik>
+- traefik.enable = *true | stack | false* #Controls if you want to publish or not the service
+  - true: the service will be published as *service_name.stack_name.traefik_domain*
+  - stack: the service will be published as *stack_name.domain*. WARNING: You can have collisions inside services within yout stack
+  - false: the service will not be published
+- traefik.domain	= *Domain name to route rule*
+- traefik.port = *port to expose throught traefik*
 
-[alpine-traefik]: https://github.com/rawmind0/alpine-traefik 
+[alpine-traefik]: https://github.com/rawmind0/alpine-traefik
 [rancher-tools]: https://github.com/rawmind0/rancher-tools
