@@ -28,7 +28,7 @@ Traefik labels, has to be created in your service, in order to get included in t
   - true: the service will be published as *service_name.stack_name.traefik_domain*
   - stack: the service will be published as *stack_name.domain*. WARNING: You can have collisions inside services within yout stack
   - false: the service will not be published
-- traefik.domain	= *Domain names to route rules. Multiple doamins separated by ","*
+- traefik.domain	= *Domain names to route rules. Multiple domains separated by ","*
 - traefik.port = *port to expose throught traefik*
 
 [alpine-traefik]: https://github.com/rawmind0/alpine-traefik
