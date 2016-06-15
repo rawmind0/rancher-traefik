@@ -1,0 +1,9 @@
+[template]
+prefix = "/self/service/metadata"
+src = "traefik.crt.tmpl"
+dest = "/opt/traefik/certs/traefik.crt"
+owner = "traefik"
+mode = "0600"
+keys = [
+  "/traefik",
+]
