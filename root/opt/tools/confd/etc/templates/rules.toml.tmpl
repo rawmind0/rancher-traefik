@@ -17,7 +17,7 @@
                             url = "https://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}:{{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}"
                         {{- else }}
                             url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}:{{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}"
-                        {{ - end }}
+                        {{- end }}
                             weight = 0
                     {{- end -}}
                 {{- end -}}
@@ -35,7 +35,7 @@
                             url = "https://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}:{{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}"
                         {{- else }}
                             url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container)}}:{{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}"
-                        {{ - end }}
+                        {{- end }}
                             weight = 0
                     {{- end -}}
                 {{- end -}}
