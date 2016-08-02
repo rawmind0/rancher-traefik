@@ -30,6 +30,8 @@ Traefik labels, has to be created in your service, in order to get included in t
   - false: the service will not be published
 - traefik.domain	= *Domain names to route rules. Multiple domains separated by ","*
 - traefik.port = *port to expose throught traefik*
+- traefik.separator = *separator between service name and stack name, can be useful for wildcard certificates*
+- traefik.subdomain = the service will be published as *subdomain.traefik_domain*
 
 WARNING: Only services with healthy state are added to traefik, so health checks are mandatory.
 

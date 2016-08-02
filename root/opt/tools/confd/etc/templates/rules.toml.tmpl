@@ -24,7 +24,17 @@
         backend = "{{$service_name}}__{{$stack_name}}"
         passHostHeader = true
         [frontends.{{$service_name}}__{{$stack_name}}.routes.service]{{ $domains := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)) " " "" -1}}
+{{if exists (printf "/stacks/%s/services/%s/labels/traefik.subdomain" $stack_name $service_name)}}
+        {{$traefik_subdomain := getv (printf "/stacks/%s/services/%s/labels/traefik.subdomain" $stack_name $service_name)}}
+        {{ $domain := split $domains "," }}rule = "Host:{{range $i, $v := $domain}}{{if $i}},{{end}}{{$traefik_subdomain}}.{{$v}}{{end}}"
+{{else}}
+{{if exists (printf "/stacks/%s/services/%s/labels/traefik.fqdnseparator" $stack_name $service_name)}}
+        {{$traefik_separator := getv (printf "/stacks/%s/services/%s/labels/traefik.fqdnseparator" $stack_name $service_name)}}
+        {{ $domain := split $domains "," }}rule = "Host:{{range $i, $v := $domain}}{{if $i}},{{end}}{{toLower $service_name}}{{$traefik_separator}}{{toLower $stack_name}}.{{$v}}{{end}}"
+{{else}}
         {{ $domain := split $domains "," }}rule = "Host:{{range $i, $v := $domain}}{{if $i}},{{end}}{{toLower $service_name}}.{{toLower $stack_name}}.{{$v}}{{end}}"
+{{end}}
+{{end}}
 {{else}}{{if eq $traefik_enable "stack"}}
     [frontends.{{$stack_name}}]
         backend = "{{$stack_name}}"
