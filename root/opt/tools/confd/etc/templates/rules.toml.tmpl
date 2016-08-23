@@ -80,10 +80,10 @@
           {{- $domain := split $domains ","}}
           {{- range $i, $v := $domain -}}
             {{- if $i -}},{{- end -}}
-            {{- toLower $service_name -}}.{{- toLower $stack_name -}}.{{- $v -}}
+            {{- toLower $stack_name -}}.{{- $v -}}
           {{- end -}}
         {{- else -}}
-          {{- toLower $service_name -}}.{{- toLower $stack_name -}}
+          {{- toLower $stack_name -}}
         {{- end}}"
       {{- end -}}
       {{- end -}}
