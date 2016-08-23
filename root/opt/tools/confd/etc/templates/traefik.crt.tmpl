@@ -1,6 +1,6 @@
 {{- if exists "/traefik/ssl_crt" -}}
   {{- $traefik_crt := getv "/traefik/ssl_crt" -}}
-  {{- if ne $traefik_crt ""}}
-    {{ $traefik_crt }}
+  {{- if ne $traefik_crt "" -}}
+    {{$traefik_crt}}
   {{- end -}}
 {{- end -}}
