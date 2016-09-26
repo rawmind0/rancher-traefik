@@ -23,6 +23,26 @@
           {{- end -}}
         {{- end -}}
       {{- else -}}
+      {{- if eq $traefik_enable "custom"}}
+  [backends.{{$service_name}}__{{$stack_name}}]
+    [backends.{{$service_name}}__{{$stack_name}}.circuitbreaker]
+      expression = "NetworkErrorRatio() > 0.5"
+    [backends.{{$service_name}}__{{$stack_name}}.LoadBalancer]
+      method = "drr"
+        {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
+          {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+          {{- if eq $back_status "healthy" }}
+    [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
+      url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
+            {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+              {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
+            {{- else -}}
+              80
+            {{- end}}"
+      weight = 0
+          {{- end -}}
+        {{- end -}}
+      {{- else -}}
       {{- if eq $traefik_enable "stack"}}
   [backends.{{$stack_name}}]
     [backends.{{$stack_name}}.circuitbreaker]
@@ -42,6 +62,7 @@
       weight = 0
           {{- end -}}
         {{- end -}}
+      {{- end -}}
       {{- end -}}
       {{- end -}}
     {{- end -}}
@@ -85,6 +106,25 @@
         {{- else -}}
           {{- toLower $stack_name -}}
         {{- end}}"
+       {{- else -}}
+      {{- if eq $traefik_enable "custom"}}
+  [frontends.{{$stack_name}}]
+    backend = "{{$service_name}}__{{$stack_name}}"
+    passHostHeader = true
+    [frontends.{{$stack_name}}.routes.service]
+      rule = "Host:
+        {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name) -}}
+          {{- $domains := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)) " " "" -1 -}}
+          {{- $name := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.name" $stack_name $service_name)) " " "" -1 -}}
+          {{- $domain := split $domains ","}}
+          {{- range $i, $v := $domain -}}
+            {{- if $i -}},{{- end -}}
+            {{- toLower $name -}}.{{- $v -}}
+          {{- end -}}
+        {{- else -}}
+          {{- toLower $stack_name -}}
+        {{- end}}"
+      {{- end -}}
       {{- end -}}
       {{- end -}}
     {{- end -}}
@@ -110,6 +150,19 @@
               {{- end}}]
             {{- end -}}
           {{- else -}}
+          {{- if eq $traefik_enable "custom"}}
+            {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name) -}}
+              {{- $domains := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)) " " "" -1 -}}
+              {{- $domain := split $domains ","}}
+              {{- range $i, $v := $domain}}
+[[acme.domains]]
+  main = "{{toLower $stack_name}}.{{$v}}"
+  sans = ["
+                {{- if $i -}},{{- end -}}
+                {{- toLower $service_name -}}.{{- toLower $stack_name -}}.{{- $v -}}"
+              {{- end}}]
+            {{- end -}}
+          {{- else -}}
           {{- if eq $traefik_enable "stack"}}
             {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name) -}}
               {{- $domains := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)) " " "" -1 -}}
@@ -122,6 +175,7 @@
                 {{- toLower $stack_name -}}.{{- $v -}}"
               {{- end}}]
             {{- end -}}
+          {{- end -}}
           {{- end -}}
           {{- end -}}
         {{- end -}}
