@@ -99,7 +99,7 @@
           {{- end -}}
         {{- else -}}
           {{- toLower $service_name -}}.{{- toLower $stack_name -}}
-        {- end -}}
+        {{- end -}}
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.path" $stack_name $service_name) -}}
           {{- $service_path := getv (printf "/stacks/%s/services/%s/labels/traefik.path" $stack_name $service_name) -}}
           ;Path:{{- toLower $service_path -}}
