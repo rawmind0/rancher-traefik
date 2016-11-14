@@ -31,7 +31,7 @@ Traefik labels, has to be created in your service or externalService, in order t
   - stack: the service will be published as *stack_name.domain*. WARNING: You can have collisions inside services within your stack
   - false: the service will not be published
 - traefik.domain = < domain.name >	# Domain names to route rules. Multiple domains separated by ","
-- traefik.path = < path >		    # Path to route rule 
+- traefik.path = < path >		    # Path to route rule. Multiple domains separated by ","
 - traefik.port = <port>				# port to expose throught traefik
 - traefik.acme = < true | false >	# Enable/disable ACME traefik feature
 
