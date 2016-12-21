@@ -100,7 +100,7 @@
               {{- $domains := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)) " " "" -1 -}}
               {{- $domain := split $domains ","}}
               {{- range $i, $v := $domain}}
-                {{- if not $i -}}
+                {{- if not $i}}
 [[acme.domains]]
                   {{- if eq $traefik_enable "true"}}
   main = "{{toLower $service_name}}.{{toLower $stack_name}}.{{$v}}"

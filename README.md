@@ -13,7 +13,7 @@ docker build -t rawmind/rancher-traefik:<version> .
 
 ## Versions
 
-- `0.3.4-7` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-7/Dockerfile)
+- `0.3.4-12` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-12/Dockerfile)
 - `0.3.4` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4/Dockerfile)
 
 
@@ -30,6 +30,7 @@ Traefik labels, has to be created in your service or externalService, in order t
   - true: the service will be published as *service_name.stack_name.traefik_domain*
   - stack: the service will be published as *stack_name.domain*. WARNING: You can have collisions inside services within your stack
   - false: the service will not be published
+- traefik.alias = < alias >			# Alternate names to route rule. Multiple values separated by ",". WARNING: You could have collisions BE CAREFULL
 - traefik.domain = < domain.name >	# Domain names to route rules. Multiple domains separated by ","
 - traefik.path = < path >		    # Path to route rule. Multiple domains separated by ","
 - traefik.port = <port>				# port to expose throught traefik

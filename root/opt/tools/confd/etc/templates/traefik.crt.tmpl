@@ -1,5 +1,5 @@
 {{- $traefik_crt := getv "/traefik/ssl_crt" -}}
-{{- if eq ( len $traefik_crt) 0 -}}
+{{- if eq ( len $traefik_crt) 1 -}}
 -----BEGIN CERTIFICATE-----
 MIIFpzCCA4+gAwIBAgIJAMLzkyNyXM/VMA0GCSqGSIb3DQEBCwUAMGoxCzAJBgNV
 BAYTAkVTMQ8wDQYDVQQIDAZNYWRyaWQxDzANBgNVBAcMBk1hZHJpZDEVMBMGA1UE
