@@ -74,7 +74,7 @@
               {{- $aliases := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.alias" $stack_name $service_name)) " " "" -1 -}}
               {{- $alias := split $aliases ","}}
               {{- range $i2, $a:= $alias -}}
-                ,{{- toLower $a -}}.{{- $v -}}
+                ,{{- if not (eq $a "") -}}{{- toLower $a -}}.{{- end -}}{{- $v -}}
               {{- end -}}
             {{- end -}}
           {{- end -}}
@@ -86,7 +86,7 @@
           {{- $path := split $paths "," -}}
           {{- range $i, $p := $path -}}
             {{- if $i -}},{{- end -}}
-            {{- toLower $p -}}
+            {{- if not (eq $p "") -}}{{- toLower $p -}}{{- end -}}
           {{- end -}}
           ;
         {{- end -}}
@@ -96,7 +96,7 @@
           {{- $path := split $paths "," -}}
           {{- range $i, $p := $path -}}
             {{- if $i -}},{{- end -}}
-            {{- toLower $p -}}
+            {{- if not (eq $p "") -}}{{- toLower $p -}}{{- end -}}
           {{- end -}}
           ;
         {{- end -}}
@@ -106,7 +106,7 @@
           {{- $path := split $paths "," -}}
           {{- range $i, $p := $path -}}
             {{- if $i -}},{{- end -}}
-            {{- toLower $p -}}
+            {{- if not (eq $p "") -}}{{- toLower $p -}}{{- end -}}
           {{- end -}}
           ;
         {{- end -}}
@@ -116,7 +116,7 @@
           {{- $path := split $paths "," -}}
           {{- range $i, $p := $path -}}
             {{- if $i -}},{{- end -}}
-            {{- toLower $p -}}
+            {{- if not (eq $p "") -}}{{- toLower $p -}}{{- end -}}
           {{- end -}}
           ;
         {{- end -}}
@@ -153,7 +153,7 @@
   sans = ["
                     {{- range $i2 , $a:= $alias -}}
                       {{- if or ($i) ($i2) -}},{{- end -}}
-                      {{- toLower $a -}}.{{- $v -}}
+                      {{- if not (eq $a "") -}}{{- toLower $a -}}.{{- end -}}{{- $v -}}
                     {{- end -}}
                     {{- end -}}
                   {{- else -}}
@@ -173,7 +173,7 @@
                       {{- end -}}
                     {{- end -}}
                     {{- range $i2 , $a:= $alias -}}
-                      ,{{- toLower $a -}}.{{- $v -}}
+                      ,{{- if not (eq $a "") -}}{{- toLower $a -}}.{{- end -}}{{- $v -}}
                     {{- end -}}
                   {{- else -}}
                     {{- if gt $i 1 -}},{{- end -}}

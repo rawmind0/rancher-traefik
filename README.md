@@ -13,7 +13,7 @@ docker build -t rawmind/rancher-traefik:<version> .
 
 ## Versions
 
-- `0.3.4-14` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-14/Dockerfile)
+- `0.3.4-15` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-15/Dockerfile)
 - `0.3.4` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4/Dockerfile)
 
 
@@ -30,15 +30,15 @@ Traefik labels, has to be created in your service or externalService, in order t
   - true: the service will be published as *service_name.stack_name.traefik_domain*
   - stack: the service will be published as *stack_name.domain*. WARNING: You can have collisions inside services within your stack
   - false: the service will not be published
-- traefik.priority = <priority>     # Override for frontend priority
-- traefik.alias = < alias >			# Alternate names to route rule. Multiple values separated by ",". WARNING: You could have collisions BE CAREFULL
-- traefik.domain = < domain.name >	# Domain names to route rules. Multiple domains separated by ","
-- traefik.path = < path >		    # Path to route rule. Multiple domains separated by ","
-- traefik.port = <port>				# port to expose throught traefik
-- traefik.acme = < true | false >	# Enable/disable ACME traefik feature
-- traefik.path.strip = < path >		       # Path strip rule. Multiple domains separated by ","
-- traefik.path.prefix = < path >	       # Path prefix rule. Multiple domains separated by ","
-- traefik.path.prefix.strip = < path >	   # Path prefix strip rule. Multiple domains separated by ","
+- traefik.priority = <priority>     	  	# Override for frontend priority. 5 by default
+- traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". WARNING: You could have collisions BE CAREFULL
+- traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
+- traefik.port = <port>						# port to expose throught traefik
+- traefik.acme = < true | false >			# Enable/disable ACME traefik feature
+- traefik.path = < path >		    		# Path rule. Multiple values separated by ","
+- traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
+- traefik.path.prefix = < path >	       	# Path prefix rule. Multiple values separated by ","
+- traefik.path.prefix.strip = < path >	   	# Path prefix strip rule. Multiple values separated by ","
 
 WARNING: Only services with healthy state are added to traefik, so health checks are mandatory.
 
