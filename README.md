@@ -24,7 +24,7 @@ This image has to be run as a sidekick of [rawmind/alpine-traefik][alpine-traefi
 
 ## Configuration labels
 
-Traefik labels, has to be created in your service or externalService, in order to get included in traefik dynamic config. 
+Traefik labels, has to be created in your service or externalService, in order to get included in traefik dynamic config.
 
 - traefik.enable = < true | stack | false > #Controls if you want to publish or not the service
   - true: the service will be published as *service_name.stack_name.traefik_domain*
@@ -35,8 +35,13 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.path = < path >		    # Path to route rule. Multiple domains separated by ","
 - traefik.port = <port>				# port to expose throught traefik
 - traefik.acme = < true | false >	# Enable/disable ACME traefik feature
+- traefik.path.strip = < path >		    # Path strip rule. Multiple domains separated by ","
+- traefik.path.prefix = < path >		   # Path prefix rule. Multiple domains separated by ","
+- traefik.path.prefix.strip = < path >		    # Path prefix strip rule. Multiple domains separated by ","
 
 WARNING: Only services with healthy state are added to traefik, so health checks are mandatory.
+
+Details for configuring the traefik rules can be found at: https://docs.traefik.io/basics/#frontends
 
 [alpine-traefik]: https://github.com/rawmind0/alpine-traefik
 [rancher-tools]: https://github.com/rawmind0/rancher-tools
