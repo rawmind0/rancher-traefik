@@ -99,7 +99,7 @@
             {{- toLower $p -}}
           {{- end -}}
           ;
-        {{- end}}
+        {{- end -}}
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.path.prefix" $stack_name $service_name) -}}
           PathPrefix:
           {{- $paths := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.path.prefix" $stack_name $service_name)) " " "" -1 -}}
