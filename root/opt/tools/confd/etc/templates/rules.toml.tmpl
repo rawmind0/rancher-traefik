@@ -89,7 +89,7 @@
             {{- toLower $p -}}
           {{- end -}}
           ;
-        {{- end}}
+        {{- end -}}
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.path.strip" $stack_name $service_name) -}}
           PathStrip:
           {{- $paths := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.path.strip" $stack_name $service_name)) " " "" -1 -}}
