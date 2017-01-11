@@ -13,7 +13,7 @@ docker build -t rawmind/rancher-traefik:<version> .
 
 ## Versions
 
-- `0.3.4-15` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-15/Dockerfile)
+- `0.3.4-16` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-16/Dockerfile)
 - `0.3.4` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4/Dockerfile)
 
 
