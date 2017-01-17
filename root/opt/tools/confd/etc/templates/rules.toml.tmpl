@@ -78,6 +78,13 @@
               {{- end -}}
             {{- end -}}
           {{- end -}}
+          {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.supplemental_fqdns" $stack_name $service_name) -}}
+            {{- $fqdns := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.supplemental_fqdns" $stack_name $service_name)) " " "" -1 -}}
+            {{- $fqdnlist := split $fqdns ","}}
+            {{- range $i, $fqdn := $fqdnlist -}}
+              ,{{- toLower $fqdn -}}
+            {{- end -}}
+          {{- end -}}
           ;
         {{- end -}}
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.path" $stack_name $service_name) -}}
