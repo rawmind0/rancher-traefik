@@ -33,6 +33,7 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.priority = <priority>     	  	# Override for frontend priority. 5 by default
 - traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". WARNING: You could have collisions BE CAREFULL
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
+- traefik.domain.regexp = < domain.regexp > # Domain name regexp rule. Multiple domains separated by ","
 - traefik.port = <port>						# port to expose throught traefik
 - traefik.acme = < true | false >			# Enable/disable ACME traefik feature
 - traefik.path = < path >		    		# Path rule. Multiple values separated by ","
