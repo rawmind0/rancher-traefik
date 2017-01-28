@@ -11,11 +11,51 @@
       method = "drr"
         {{- $service_kind := getv (printf "/stacks/%s/services/%s/kind" $stack_name $service_name) -}}
         {{- if eq $service_kind "service" -}}
-          {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
-            {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
-            {{- if eq $back_status "healthy" }}
+          {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
+            {{- $traefik_protocol := getv (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
+            {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
+              {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+              {{- if eq $back_status "healthy" }}
+    [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
+                {{- if eq $traefik_protocol "https"}}
+      url = "{{$traefik_protocol}}://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
+                {{- else}}
+      url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
+                {{- end -}}
+                {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+                    {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
+                {{- else -}}
+                80
+                {{- end}}"
+      weight = 0
+              {{- end -}}
+            {{- end -}}
+          {{- else -}}
+            {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
+              {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+              {{- if eq $back_status "healthy" }}
     [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
       url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
+                {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+                    {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
+                {{- else -}}
+                80
+                {{- end}}"
+      weight = 0
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}  
+        {{- else -}}
+        {{- if eq $service_kind "externalService" -}}
+          {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
+            {{- $traefik_protocol := getv (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
+            {{- range $i2, $external_ip := ls (printf "/stacks/%s/services/%s/external_ips" $stack_name $service_name) }}
+    [backends.{{$service_name}}__{{$stack_name}}.servers.{{$stack_name}}_{{$service_name}}_external_ip_{{$external_ip}}]
+              {{- if eq $traefik_protocol "https"}}
+      url = "{{$traefik_protocol}}://{{getv (printf "/stacks/%s/services/%s/external_ips/%s" $stack_name $service_name $external_ip) -}}:
+              {{- else}}
+      url = "http://{{getv (printf "/stacks/%s/services/%s/external_ips/%s" $stack_name $service_name $external_ip) -}}:
+              {{- end -}}
               {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
               {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
               {{- else -}}
@@ -23,18 +63,17 @@
               {{- end}}"
       weight = 0
             {{- end -}}
-          {{- end -}}
-        {{- else -}}
-        {{- if eq $service_kind "externalService" -}}
-          {{- range $i2, $external_ip := ls (printf "/stacks/%s/services/%s/external_ips" $stack_name $service_name) }}
+          {{- else -}}
+            {{- range $i2, $external_ip := ls (printf "/stacks/%s/services/%s/external_ips" $stack_name $service_name) }}
     [backends.{{$service_name}}__{{$stack_name}}.servers.{{$stack_name}}_{{$service_name}}_external_ip_{{$external_ip}}]
       url = "http://{{getv (printf "/stacks/%s/services/%s/external_ips/%s" $stack_name $service_name $external_ip) -}}:
-            {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
-            {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
-            {{- else -}}
-            80
-            {{- end}}"
+              {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+              {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
+              {{- else -}}
+              80
+              {{- end}}"
       weight = 0
+            {{- end -}}
           {{- end -}}
         {{- end -}}
         {{- end -}}
@@ -160,10 +199,13 @@
                     {{- $alias := split $aliases ","}}
                     {{- if or (gt (len $domain) 1) (len $alias)}}
   sans = ["
-                    {{- range $i2 , $a:= $alias -}}
-                      {{- if or ($i) ($i2) -}},{{- end -}}
-                      {{- if not (eq $a "") -}}{{- toLower $a -}}.{{- end -}}{{- $v -}}
-                    {{- end -}}
+                      {{- range $i2 , $a:= $alias -}}
+                        {{- if or ($i) ($i2) -}},{{- end -}}
+                        {{- if not (eq $a "") -}}{{- toLower $a -}}.{{- end -}}{{- $v -}}
+                      {{- end -}}
+                      {{- if (eq (len $domain) 1) -}}
+          "]
+                      {{end -}}
                     {{- end -}}
                   {{- else -}}
                     {{- if gt (len $domain) 1}}
@@ -183,7 +225,7 @@
                     {{- end -}}
                     {{- range $i2 , $a:= $alias -}}
                       ,{{- if not (eq $a "") -}}{{- toLower $a -}}.{{- end -}}{{- $v -}}
-                    {{- end -}}
+                    {{- end}}
                   {{- else -}}
                     {{- if gt $i 1 -}},{{- end -}}
                     {{- if eq $traefik_enable "true" -}}
@@ -194,8 +236,9 @@
                       {{- end -}}
                     {{- end -}}
                   {{- end -}}
-                {{- end -}}
-              {{- end}}"]
+          "]
+                {{end -}}
+              {{- end -}}
             {{- end -}}
           {{- end -}}
         {{- end -}}
