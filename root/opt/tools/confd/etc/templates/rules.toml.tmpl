@@ -10,7 +10,7 @@
     [backends.{{$service_name}}__{{$stack_name}}.LoadBalancer]
       method = "drr"
         {{- $traefik_sticky := getv (printf "/stacks/%s/services/%s/labels/traefik.sticky" $stack_name $service_name) -}}
-        {{- if eq $traefik_sticky "true" -}}
+        {{- if eq $traefik_sticky "true"}}
       sticky = true
         {{- end -}}
         {{- $service_kind := getv (printf "/stacks/%s/services/%s/kind" $stack_name $service_name) -}}
