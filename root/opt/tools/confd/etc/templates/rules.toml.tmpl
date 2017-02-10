@@ -236,6 +236,7 @@
                           {{- if or ($i) ($i2) -}},{{- end -}}
                           {{- if not (eq $af "") -}}{{- toLower $af -}}{{- end -}}
                         {{- end -}}
+                        {{- if (gt (len $domain) 1) -}},{{- end -}}
                       {{- end -}}
                       {{- if (eq (len $domain) 1) -}}
           "]
