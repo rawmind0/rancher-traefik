@@ -218,8 +218,7 @@
                         {{- $afqdns := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.alias.fqdn" $stack_name $service_name)) " " "" -1 -}}
                         {{- $afqdn := split $afqdns ","}}
                         {{- range $i2, $af := $afqdn -}}
-                          {{- if or ($i) ($i2) -}},{{- end -}}
-                          {{- if not (eq $af "") -}}{{- toLower $af -}}{{- end -}}
+                          ,{{- if not (eq $af "") -}}{{- toLower $af -}}{{- end -}}
                         {{- end -}}
                       {{- end -}}
                       {{- if (eq (len $domain) 1) -}}
