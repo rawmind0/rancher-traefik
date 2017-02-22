@@ -32,7 +32,9 @@ Traefik labels, has to be created in your service or externalService, in order t
   - false: the service will not be published
 - traefik.priority = <priority>     	  	# Override for frontend priority. 5 by default
 - traefik.protocol = < http | https	>		# Override the default http protocol
-- traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". WARNING: You could have collisions BE CAREFULL
+- traefik.sticky = < true | false	>		# Enable/disable sticky sessions to the backend
+- traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain is appended. WARNING: You could have collisions BE CAREFULL
+- traefik.alias.fqdn = < alias fqdn >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain must be defined but is not appended here.
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
 - traefik.domain.regexp = < domain.regexp > # Domain name regexp rule. Multiple domains separated by ","
 - traefik.port = <port>						# port to expose throught traefik
