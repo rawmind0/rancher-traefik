@@ -50,7 +50,7 @@
       weight = 0
               {{- end -}}
             {{- end -}}
-          {{- end -}}  
+          {{- end -}}
         {{- else -}}
         {{- if eq $service_kind "externalService" -}}
           {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
@@ -101,6 +101,9 @@
                 {{ else -}}
                   5
                 {{- end}}
+    {{if exists (printf "/stacks/%s/services/%s/labels/traefik.entrypoints" $stack_name $service_name) -}}
+    entrypoints = ["{{- getv (printf "/stacks/%s/services/%s/labels/traefik.entrypoints" $stack_name $service_name) -}}"]
+    {{- end}}
     [frontends.{{$service_name}}__{{$stack_name}}.routes.service]
       rule = "
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.domain.regexp" $stack_name $service_name) -}}HostRegexp:

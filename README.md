@@ -43,6 +43,7 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
 - traefik.path.prefix = < path >	       	# Path prefix rule. Multiple values separated by ","
 - traefik.path.prefix.strip = < path >	   	# Path prefix strip rule. Multiple values separated by ","
+- traefik.entrypoints = < http | https >    # Override for frontend protocol
 
 WARNING: Only services with healthy state are added to traefik, so health checks are mandatory.
 
