@@ -140,6 +140,8 @@
             {{- end -}}
           {{- end -}}
           ;
+        {{- else -}}
+          Host: {{- toLower $service_name -}}.{{- toLower $stack_name -}};
         {{- end -}}
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.path" $stack_name $service_name) -}}
           Path:
