@@ -38,16 +38,18 @@
             {{- end -}}
           {{- else -}}
             {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
-              {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
-              {{- if eq $back_status "healthy" }}
-    [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
-      url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
-                {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
-                    {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
-                {{- else -}}
-                80
-                {{- end}}"
-      weight = 0
+              {{- if not (eq $container "containers") -}}
+                {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+                {{- if eq $back_status "healthy" }}
+      [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
+        url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
+                  {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+                      {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
+                  {{- else -}}
+                  80
+                  {{- end}}"
+        weight = 0
+                {{- end -}}
               {{- end -}}
             {{- end -}}
           {{- end -}}  
