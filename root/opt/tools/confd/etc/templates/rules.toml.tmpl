@@ -110,7 +110,7 @@
               {{- if $i -}},{{- end -}}
               {{- if not (eq $r "") -}}{{- toLower $r -}}{{- end -}}
             {{- end -}}
-          ;
+          ,
         {{- end -}}
         {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name) -}}Host:
           {{- $domains := replace (getv (printf "/stacks/%s/services/%s/labels/traefik.domain" $stack_name $service_name)) " " "" -1 -}}
