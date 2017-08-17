@@ -20,34 +20,38 @@
           {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
             {{- $traefik_protocol := getv (printf "/stacks/%s/services/%s/labels/traefik.protocol" $stack_name $service_name) -}}
             {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
-              {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
-              {{- if eq $back_status "healthy" }}
+              {{- if exists (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+                {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+                {{- if eq $back_status "healthy" }}
     [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
-                {{- if eq $traefik_protocol "https"}}
+                  {{- if eq $traefik_protocol "https"}}
       url = "{{$traefik_protocol}}://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
-                {{- else}}
+                  {{- else}}
       url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
-                {{- end -}}
-                {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+                  {{- end -}}
+                  {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
                     {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
-                {{- else -}}
-                80
-                {{- end}}"
+                  {{- else -}}
+                  80
+                  {{- end}}"
       weight = 0
+                {{- end -}}
               {{- end -}}
             {{- end -}}
           {{- else -}}
             {{- range $i2, $container := ls (printf "/stacks/%s/services/%s/containers" $stack_name $service_name) -}}
-              {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
-              {{- if eq $back_status "healthy" }}
+              {{- if exists (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+                {{- $back_status := getv (printf "/stacks/%s/services/%s/containers/%s/health_state" $stack_name $service_name $container) -}}
+                {{- if eq $back_status "healthy" }}
     [backends.{{$service_name}}__{{$stack_name}}.servers.{{getv (printf "/stacks/%s/services/%s/containers/%s/name" $stack_name $service_name $container)}}]
       url = "http://{{getv (printf "/stacks/%s/services/%s/containers/%s/primary_ip" $stack_name $service_name $container) -}}:
-                {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
+                  {{- if exists (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name) -}}
                     {{getv (printf "/stacks/%s/services/%s/labels/traefik.port" $stack_name $service_name)}}
-                {{- else -}}
-                80
-                {{- end}}"
+                  {{- else -}}
+                  80
+                  {{- end}}"
       weight = 0
+                {{- end -}}
               {{- end -}}
             {{- end -}}
           {{- end -}}  
