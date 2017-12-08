@@ -1,0 +1,2 @@
+destination: /opt/traefik/etc/rules.toml
+source: /opt/tools/rancher-template/tmpl/traefik.tmpl

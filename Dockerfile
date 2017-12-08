@@ -1,4 +1,4 @@
-FROM rawmind/rancher-tools:3.5-3
+FROM rawmind/rancher-tools:3.6-3
 MAINTAINER Raul Sanchez <rawmind@gmail.com>
 
 #Set environment
@@ -12,4 +12,5 @@ ENV SERVICE_NAME=traefik \
 # Add files
 ADD root /
 RUN cd ${SERVICE_VOLUME} && \
-    tar czvf ${SERVICE_ARCHIVE} * ; rm -rf ${SERVICE_VOLUME}/* 
+    tar czvf ${SERVICE_ARCHIVE} * ; rm -rf ${SERVICE_VOLUME}/* && \
+    chown -R ${SERVICE_UID}:${SERVICE_GID} ${SERVICE_VOLUME}

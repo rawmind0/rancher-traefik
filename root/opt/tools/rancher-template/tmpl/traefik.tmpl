@@ -1,0 +1,248 @@
+[backends]
+{{- range $stack_index, $stack := . }}
+  {{- range $service_index, $service := $stack.Services }}
+    {{- $traefik_enable := (index $service.Labels "traefik.enable") -}}
+    {{- if or (eq $traefik_enable "true") (eq $traefik_enable "stack")}}
+  [backends.{{$service.Name}}__{{$stack.Name}}]
+    [backends.{{$service.Name}}__{{$stack.Name}}.circuitbreaker]
+      expression = "NetworkErrorRatio() > 0.5"
+    [backends.{{$service.Name}}__{{$stack.Name}}.LoadBalancer]
+      method = "drr"
+      {{- $traefik_sticky := ( index $service.Labels "traefik.sticky") -}}
+      {{- if eq $traefik_sticky "true"}}
+      sticky = true
+      {{- end -}}
+      {{- if or (eq $service.Kind "service") (eq $service.Kind "externalService") -}}
+        {{- $traefik_protocol := (index $service.Labels "traefik.protocol") -}}
+        {{- $traefik_port := (index $service.Labels "traefik.port") -}}
+        {{- range $container_index, $container := $service.Containers -}}
+          {{- if ishealthy $container.HealthState }}
+    [backends.{{$service.Name}}__{{$stack.Name}}.servers.{{$container.Name}}]
+            {{- if eq $traefik_protocol "https" -}}
+              {{- if eq $service.Kind "service"}}
+      url = "{{$traefik_protocol}}://{{$container.PrimaryIp -}}:
+              {{- end -}}
+              {{- if eq $service.Kind "externalService"}}
+      url = "{{$traefik_protocol}}://{{$container.Ips -}}:
+              {{- end -}}
+            {{- else}}
+              {{- if eq $service.Kind "service"}}
+      url = "http://{{$container.PrimaryIp -}}:
+              {{- end -}}
+              {{- if eq $service.Kind "externalService"}}
+      url = "http://{{$container.Ips -}}:
+              {{- end -}}
+            {{- end -}}
+            {{- if gt $traefik_port "0" -}}
+              {{$traefik_port}}
+            {{- else -}}
+              80
+            {{- end}}"
+      weight = 0
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end}}
+[frontends]
+{{- range $stack_index, $stack := . -}}
+  {{- range $service_index, $service := $stack.Services -}}
+    {{- $traefik_enable := (index $service.Labels "traefik.enable") -}}
+    {{- if or (eq $traefik_enable "true") (eq $traefik_enable "stack") -}}
+      {{- $traefik_priority := ( index $service.Labels "traefik.priority") -}}
+      {{- $traefik_domain_regexp := ( index $service.Labels "traefik.domain.regexp") -}}
+      {{- $traefik_domain := ( index $service.Labels "traefik.domain") -}}
+      {{- $traefik_alias := ( index $service.Labels "traefik.alias") -}}
+      {{- $traefik_alias_fqdn := ( index $service.Labels "traefik.alias.fqdn") -}}
+      {{- $traefik_path := ( index $service.Labels "traefik.path") -}}
+      {{- $traefik_path_strip := ( index $service.Labels "traefik.path.strip") -}}
+      {{- $traefik_path_prefix := ( index $service.Labels "traefik.path.prefix") -}}
+      {{- $traefik_path_prefix_strip := ( index $service.Labels "traefik.path.prefix.strip")}}
+  [frontends.{{$service.Name}}__{{$stack.Name}}]
+    backend = "{{$service.Name}}__{{$stack.Name}}"
+    passHostHeader = true
+    priority =  
+      {{- if gt $traefik_priority "0" -}}
+        {{$traefik_priority}}
+      {{- else -}}
+        5
+      {{- end}}
+    [frontends.{{$service.Name}}__{{$stack.Name}}.routes.service]
+      rule = "
+      {{- if gt (len $traefik_domain_regexp) 0 -}}
+        HostRegexp: 
+        {{- $regexpses := replace $traefik_domain_regexp " " "" -}}
+        {{- $regexp := split $regexpses ","}}
+        {{- range $i, $r := $regexp -}}
+          {{- if $i -}},{{- end -}}
+          {{- if not (eq $r "") -}}{{- tolower $r -}}{{- end -}}
+        {{- end -}}
+        ,
+      {{- end -}}
+      {{- if gt (len $traefik_domain) 0 -}}
+        Host: 
+        {{- $domains := replace $traefik_domain " " "" -}}
+        {{- $domain := split $domains ","}}
+        {{- range $i, $v := $domain -}}
+          {{- if $i -}},{{- end -}}
+          {{- if eq $traefik_enable "true"}}
+            {{- tolower $service.Name -}}.{{- tolower $stack.Name -}}.{{- $v -}}
+          {{- end -}}
+          {{- if eq $traefik_enable "stack"}}
+            {{- tolower $stack.Name -}}.{{- $v -}}
+          {{- end -}}
+
+          {{- if gt (len $traefik_alias) 0 -}}
+            {{- $aliases := replace $traefik_alias " " "" -}}
+            {{- $alias := split $aliases ","}}
+            {{- range $i2, $a:= $alias -}}
+              ,{{- if not (eq $a "") -}}{{- tolower $a -}}.{{- end -}}{{- $v -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+        {{- if gt (len $traefik_alias_fqdn) 0 -}}
+          {{- $afqdns := replace $traefik_alias_fqdn " " "" -}}
+          {{- $afqdn := split $afqdns ","}}
+          {{- range $i2, $af := $afqdn -}}
+            ,{{- if not (eq $af "") -}}{{- tolower $af -}}{{- end -}}
+          {{- end -}}
+          ,
+        {{- end -}}
+        ;
+      {{- else -}}
+        Host: {{- tolower $service.Name -}}.{{- tolower $stack.Name -}};
+      {{- end -}}
+      {{- if gt (len $traefik_path) 0 -}}
+        Path:
+        {{- $paths := replace $traefik_path " " "" -}}
+        {{- $path := split $paths "," -}}
+        {{- range $i, $p := $path -}}
+          {{- if $i -}},{{- end -}}
+          {{- if not (eq $p "") -}}{{- tolower $p -}}{{- end -}}
+        {{- end -}}
+        ;
+      {{- end -}}
+      {{- if gt (len $traefik_path_strip) 0 -}}
+       PathStrip:
+        {{- $paths := replace $traefik_path_strip " " "" -}}
+        {{- $path := split $paths "," -}}
+        {{- range $i, $p := $path -}}
+          {{- if $i -}},{{- end -}}
+          {{- if not (eq $p "") -}}{{- tolower $p -}}{{- end -}}
+        {{- end -}}
+        ;      
+      {{- end -}}
+      {{- if gt (len $traefik_path_prefix) 0 -}}
+        PathPrefix:
+        {{- $paths := replace $traefik_path_prefix " " "" -}}
+        {{- $path := split $paths "," -}}
+        {{- range $i, $p := $path -}}
+          {{- if $i -}},{{- end -}}
+          {{- if not (eq $p "") -}}{{- tolower $p -}}{{- end -}}
+        {{- end -}}
+        ;
+      {{- end -}}
+      {{- if gt (len $traefik_path_prefix_strip) 0 -}}
+        PathPrefixStrip:
+        {{- $paths := replace $traefik_path_prefix_strip " " "" -}}
+        {{- $path := split $paths "," -}}
+        {{- range $i, $p := $path -}}
+          {{- if $i -}},{{- end -}}
+          {{- if not (eq $p "") -}}{{- tolower $p -}}{{- end -}}
+        {{- end -}}
+        ;
+      {{- end -}}
+      "
+    {{- end -}}
+  {{- end -}}
+{{- end}}
+{{- range $stack_index, $stack := . }}
+  {{- range $service_index, $service := $stack.Services }}
+    {{- $traefik_enable := (index $service.Labels "traefik.enable") -}}
+    {{- if or (eq $traefik_enable "true") (eq $traefik_enable "stack")}}
+      {{- $traefik_acme := ( index $service.Labels "traefik.acme") -}}
+      {{- if eq $traefik_acme "true" -}}
+        {{- $traefik_domain := ( index $service.Labels "traefik.domain") -}}
+        {{- $traefik_alias := ( index $service.Labels "traefik.alias") -}}
+        {{- $traefik_alias_fqdn := ( index $service.Labels "traefik.alias.fqdn") -}}
+        {{- if gt (len $traefik_domain) 0 -}}
+          {{- $domains := replace $traefik_domain " " "" -}}
+          {{- $domain := split $domains ","}}
+          {{- range $i, $v := $domain -}}
+            {{- if not $i}}
+[[acme.domains]]
+              {{- if eq $traefik_enable "true"}}
+  main = "{{tolower $service.Name}}.{{tolower $stack.Name}}.{{$v}}"
+              {{- end}}
+              {{- if eq $traefik_enable "stack"}}
+  main = "{{tolower $stack.Name}}.{{$v}}"
+              {{- end}}
+              {{- if gt (len $traefik_alias) 0 -}}
+                {{- $aliases := replace $traefik_alias " " "" -}}
+                {{- $alias := split $aliases ","}}
+                {{- if or (gt (len $domain) 1) (len $alias)}}
+  sans = ["
+                  {{- range $i2, $a := $alias -}}
+                    {{- if or ($i) ($i2) -}},{{- end -}}
+                    {{- if not (eq $a "") -}}{{- tolower $a -}}.{{- end -}}{{- $v -}}
+                  {{- end -}}                
+                  {{- if gt (len $traefik_alias_fqdn) 0 -}}
+                    {{- $afqdns := replace $traefik_alias_fqdn " " "" -}}
+                    {{- $afqdn := split $afqdns ","}}
+                    {{- range $i2, $af := $afqdn -}}
+                      ,{{- if not (eq $af "") -}}{{- tolower $af -}}{{- end -}}
+                    {{- end -}}
+                  {{- end -}}
+                  {{- if (eq (len $domain) 1) -}}
+          "]
+                  {{end -}}
+                {{- end -}}
+              {{- else -}}
+                {{- if or (gt (len $domain) 1) (len $traefik_alias_fqdn)}}
+  sans = ["
+                  {{- if gt (len $traefik_alias_fqdn) 0 -}}
+                    {{- $afqdns := replace $traefik_alias_fqdn " " "" -}}
+                    {{- $afqdn := split $afqdns ","}}
+                    {{- range $i2, $af := $afqdn -}}
+                      {{- if or ($i) ($i2) -}},{{- end -}}
+                      {{- if not (eq $af "") -}}{{- tolower $af -}}{{- end -}}
+                    {{- end -}}
+                    {{- if (gt (len $domain) 1) -}},{{- end -}}
+                  {{- end -}}
+                  {{- if (eq (len $domain) 1) -}}
+          "]
+                  {{end -}}
+                {{- end -}}
+              {{- end -}}
+            {{- else -}}
+              {{- if gt (len $traefik_alias) 0 -}}
+                {{- if eq $traefik_enable "true"}}
+                  ,{{- tolower $service.Name -}}.{{- tolower $stack.Name -}}.{{- $v -}}
+                {{- end}}
+                {{- if eq $traefik_enable "stack"}}
+                  ,{{- tolower $stack.Name -}}.{{- $v -}}
+                {{- end}}
+                {{- $aliases := replace $traefik_alias " " "" -}}
+                {{- $alias := split $aliases ","}}
+                {{- range $i2 , $a:= $alias -}}
+                  ,{{- if not (eq $a "") -}}{{- tolower $a -}}.{{- end -}}{{- $v -}}
+                {{- end}}
+              {{- else -}}
+                {{- if gt $i 1 -}},{{- end -}}
+                {{- if eq $traefik_enable "true" -}}
+                  {{- tolower $service.Name -}}.{{- tolower $stack.Name -}}.{{- $v -}}
+                {{- else -}}
+                  {{- if eq $traefik_enable "stack"}}
+                    {{- tolower $stack.Name -}}.{{- $v -}}
+                  {{- end -}}
+                {{- end -}}
+              {{- end -}}
+          "]
+            {{end -}}            
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end}}
