@@ -16,7 +16,7 @@
         {{- $traefik_protocol := (index $service.Labels "traefik.protocol") -}}
         {{- $traefik_port := (index $service.Labels "traefik.port") -}}
         {{- range $container_index, $container := $service.Containers -}}
-          {{- if ishealthy $container.HealthState }}
+          {{- if and (ishealthy $container.HealthState) (isrunning $container.State) }}
     [backends.{{$service.Name}}__{{$stack.Name}}.servers.{{$container.Name}}]
             {{- if eq $traefik_protocol "https" -}}
               {{- if eq $service.Kind "service"}}
@@ -180,7 +180,7 @@
               {{- end}}
               {{- if gt (len $traefik_alias) 0 -}}
                 {{- $aliases := replace $traefik_alias " " "" -}}
-                {{- $alias := split $aliases ","}}
+                {{- $alias := split $aliases "," -}}
                 {{- if or (gt (len $domain) 1) (len $alias)}}
   sans = ["
                   {{- range $i2, $a := $alias -}}
@@ -189,7 +189,7 @@
                   {{- end -}}                
                   {{- if gt (len $traefik_alias_fqdn) 0 -}}
                     {{- $afqdns := replace $traefik_alias_fqdn " " "" -}}
-                    {{- $afqdn := split $afqdns ","}}
+                    {{- $afqdn := split $afqdns "," -}}
                     {{- range $i2, $af := $afqdn -}}
                       ,{{- if not (eq $af "") -}}{{- tolower $af -}}{{- end -}}
                     {{- end -}}
@@ -203,7 +203,7 @@
   sans = ["
                   {{- if gt (len $traefik_alias_fqdn) 0 -}}
                     {{- $afqdns := replace $traefik_alias_fqdn " " "" -}}
-                    {{- $afqdn := split $afqdns ","}}
+                    {{- $afqdn := split $afqdns "," -}}
                     {{- range $i2, $af := $afqdn -}}
                       {{- if or ($i) ($i2) -}},{{- end -}}
                       {{- if not (eq $af "") -}}{{- tolower $af -}}{{- end -}}
@@ -217,14 +217,14 @@
               {{- end -}}
             {{- else -}}
               {{- if gt (len $traefik_alias) 0 -}}
-                {{- if eq $traefik_enable "true"}}
+                {{- if eq $traefik_enable "true" -}}
                   ,{{- tolower $service.Name -}}.{{- tolower $stack.Name -}}.{{- $v -}}
-                {{- end}}
-                {{- if eq $traefik_enable "stack"}}
+                {{- end -}}
+                {{- if eq $traefik_enable "stack" -}}
                   ,{{- tolower $stack.Name -}}.{{- $v -}}
-                {{- end}}
+                {{- end -}}
                 {{- $aliases := replace $traefik_alias " " "" -}}
-                {{- $alias := split $aliases ","}}
+                {{- $alias := split $aliases "," -}}
                 {{- range $i2 , $a:= $alias -}}
                   ,{{- if not (eq $a "") -}}{{- tolower $a -}}.{{- end -}}{{- $v -}}
                 {{- end}}
@@ -233,7 +233,7 @@
                 {{- if eq $traefik_enable "true" -}}
                   {{- tolower $service.Name -}}.{{- tolower $stack.Name -}}.{{- $v -}}
                 {{- else -}}
-                  {{- if eq $traefik_enable "stack"}}
+                  {{- if eq $traefik_enable "stack" -}}
                     {{- tolower $stack.Name -}}.{{- $v -}}
                   {{- end -}}
                 {{- end -}}
