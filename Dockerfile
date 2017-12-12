@@ -1,4 +1,4 @@
-FROM rawmind/rancher-tools:3.6-5
+FROM rawmind/rancher-tools:3.6-6
 MAINTAINER Raul Sanchez <rawmind@gmail.com>
 
 #Set environment
