@@ -39,13 +39,13 @@
             {{- if eq $service.Kind "externalService" -}}
               {{$container.Ips}}:
             {{- end -}}
-            {{- if gt $traefik_port "0" -}}
+            {{- if gt (len $traefik_port) 0 -}}
               {{$traefik_port}}
             {{- else -}}
               80
             {{- end}}"
       weight = {{$traefik_weight := (index $service.Labels "traefik.weight") -}}
-               {{- if gt $traefik_weight "0" -}}
+               {{- if gt (len $traefik_weight) 0 -}}
                  {{$traefik_weight}}
                {{- else -}}
                  5
@@ -72,8 +72,13 @@
       {{- $traefik_path_prefix_strip := ( index $service.Labels "traefik.path.prefix.strip")}}
   [frontends.{{$service.Name}}__{{$stack.Name}}]
     backend = "{{$service.Name}}__{{$stack.Name}}"
-    passHostHeader = true
-    priority = {{if gt $traefik_priority "0" -}}
+    passHostHeader = {{$traefik_frontend_passHostHeader := (index $service.Labels "traefik.frontend.passHostHeader") -}}
+                     {{- if gt (len $traefik_frontend_passHostHeader) 0 -}}
+                       {{$traefik_frontend_passHostHeader}}
+                     {{- else -}}
+                       true
+                     {{- end}}
+    priority = {{if gt (len $traefik_priority) 0 -}}
                  {{$traefik_priority}}
                {{- else -}}
                  5
