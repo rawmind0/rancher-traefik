@@ -5,9 +5,19 @@
     {{- if or (eq $traefik_enable "true") (eq $traefik_enable "stack")}}
   [backends.{{$service.Name}}__{{$stack.Name}}]
     [backends.{{$service.Name}}__{{$stack.Name}}.circuitbreaker]
-      expression = "NetworkErrorRatio() > 0.5"
+      expression = {{$traefik_backend_circuitbreaker_expression := (index $service.Labels "traefik.backend.circuitbreaker.expression") -}}
+                   {{- if gt (len $traefik_backend_circuitbreaker_expression) 0 -}}
+                     "{{$traefik_backend_circuitbreaker_expression}}"
+                   {{- else -}}
+                     "NetworkErrorRatio() > 0.5"
+                   {{- end}}
     [backends.{{$service.Name}}__{{$stack.Name}}.LoadBalancer]
-      method = "drr"
+      method = {{$traefik_backend_loadbalancer_method := (index $service.Labels "traefik.backend.loadbalancer.method") -}}
+               {{- if gt (len $traefik_backend_loadbalancer_method) 0 -}}
+                 "{{$traefik_backend_loadbalancer_method}}"
+               {{- else -}}
+                 "drr"
+               {{- end}}
       {{- $traefik_sticky := ( index $service.Labels "traefik.sticky") -}}
       {{- if eq $traefik_sticky "true"}}
       sticky = true
@@ -18,27 +28,28 @@
         {{- range $container_index, $container := $service.Containers -}}
           {{- if and (ishealthy $container.HealthState) (isrunning $container.State) }}
     [backends.{{$service.Name}}__{{$stack.Name}}.servers.{{$container.Name}}]
-            {{- if eq $traefik_protocol "https" -}}
-              {{- if eq $service.Kind "service"}}
-      url = "{{$traefik_protocol}}://{{$container.PrimaryIp -}}:
-              {{- end -}}
-              {{- if eq $service.Kind "externalService"}}
-      url = "{{$traefik_protocol}}://{{$container.Ips -}}:
-              {{- end -}}
-            {{- else}}
-              {{- if eq $service.Kind "service"}}
-      url = "http://{{$container.PrimaryIp -}}:
-              {{- end -}}
-              {{- if eq $service.Kind "externalService"}}
-      url = "http://{{$container.Ips -}}:
-              {{- end -}}
+      url = {{if eq $traefik_protocol "https" -}}
+              "{{$traefik_protocol}}://
+            {{- else -}}
+              "http://
+            {{- end -}}
+            {{- if eq $service.Kind "service" -}}
+              {{$container.PrimaryIp}}:
+            {{- end -}}
+            {{- if eq $service.Kind "externalService" -}}
+              {{$container.Ips}}:
             {{- end -}}
             {{- if gt $traefik_port "0" -}}
               {{$traefik_port}}
             {{- else -}}
               80
             {{- end}}"
-      weight = 0
+      weight = {{$traefik_weight := (index $service.Labels "traefik.weight") -}}
+               {{- if gt $traefik_weight "0" -}}
+                 {{$traefik_weight}}
+               {{- else -}}
+                 5
+               {{- end}}
           {{- end -}}
         {{- end -}}
       {{- end -}}
@@ -62,12 +73,11 @@
   [frontends.{{$service.Name}}__{{$stack.Name}}]
     backend = "{{$service.Name}}__{{$stack.Name}}"
     passHostHeader = true
-    priority =  
-      {{- if gt $traefik_priority "0" -}}
-        {{$traefik_priority}}
-      {{- else -}}
-        5
-      {{- end}}
+    priority = {{if gt $traefik_priority "0" -}}
+                 {{$traefik_priority}}
+               {{- else -}}
+                 5
+               {{- end}}
     [frontends.{{$service.Name}}__{{$stack.Name}}.routes.service]
       rule = "
       {{- if gt (len $traefik_domain_regexp) 0 -}}

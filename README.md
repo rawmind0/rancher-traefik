@@ -13,7 +13,7 @@ docker build -t rawmind/rancher-traefik:<version> .
 
 ## Versions
 
-- `1.4.4-4` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.4.4-4/Dockerfile) 
+- `1.4.4-5` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.4.4-5/Dockerfile) 
 - `1.3.6` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.3.6/Dockerfile)
 - `1.3.3-2` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.3.3-2/Dockerfile)
 - `0.3.4-19` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/0.3.4-19/Dockerfile)
@@ -35,6 +35,9 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.priority = <priority>     	  	# Override for frontend priority. 5 by default
 - traefik.protocol = < http | https	>		# Override the default http protocol
 - traefik.sticky = < true | false	>		# Enable/disable sticky sessions to the backend
+- traefik.backend.loadbalancer.method = < drr | wrr > # Override default lb algorithm drr
+- traefik.backend.circuitbreaker.expression = < expression > # Override default backend circuitbreaker expression `NetworkErrorRatio() > 0.5`
+- traefik.weight = < weight >               # Override default backend weight 5
 - traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain is appended. WARNING: You could have collisions BE CAREFULL
 - traefik.alias.fqdn = < alias fqdn >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain must be defined but is not appended here.
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
