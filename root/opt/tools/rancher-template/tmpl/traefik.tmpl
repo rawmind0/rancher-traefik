@@ -154,27 +154,20 @@
         ;
       {{- end -}}
       "
-    {{- $traefik_ratelimit_period := (index $service.Labels "traefik.ratelimit.period") -}}
-    {{- $traefik_ratelimit_average := (index $service.Labels "traefik.ratelimit.average") -}}
-    {{- $traefik_ratelimit_burst := (index $service.Labels "traefik.ratelimit.burst") -}}
-    {{- if or (gt (len $traefik_ratelimit_period) 0) (gt $traefik_ratelimit_average 0) (gt $traefik_ratelimit_burst 0) -}}
-    [frontends.{{$service.Name}}__{{$stack.Name}}.ratelimit]
+    {{- $traefik_ratelimit_enable := (index $service.Labels "traefik.ratelimit.enable") -}}
+    {{- if eq $traefik_ratelimit_enable "true" -}}
+        {{- $traefik_ratelimit_period := (index $service.Labels "traefik.ratelimit.period") -}}
+        {{- $traefik_ratelimit_average := (index $service.Labels "traefik.ratelimit.average") -}}
+        {{- $traefik_ratelimit_burst := (index $service.Labels "traefik.ratelimit.burst") }}
+  [frontends.{{$service.Name}}__{{$stack.Name}}.ratelimit]
     extractorfunc = "client.ip"
-        [frontends.{{$service.Name}}__{{$stack.Name}}.ratelimit.rateset.rateset1]
-        {{- if gt (len $traefik_ratelimit_period) 0}}
-        period = "$traefik_ratelimit_period"
-        {{- else}}
-        period = "10s"
-        {{- end}}"
-        {{- if gt $traefik_ratelimit_average 0}}
-        average = $traefik_ratelimit_average
-        {{- else}}
-        average = 100
-        {{- if gt $traefik_ratelimit_burst 0}}
-        burst = $traefik_ratelimit_burst
-        {{- else}}
-        burst = 200
-        {{- end}}
+    [frontends.{{$service.Name}}__{{$stack.Name}}.ratelimit.rateset.rateset1]
+      period = {{if gt (len $traefik_ratelimit_period) 0 -}}"{{$traefik_ratelimit_period}}s"
+               {{- else -}} "10s"{{- end }}
+      average = {{if gt (len $traefik_ratelimit_average) 0 -}}{{$traefik_ratelimit_average}}
+                {{- else -}}100{{- end}}
+      burst = {{if gt (len $traefik_ratelimit_burst) 0}}{{$traefik_ratelimit_burst}}
+              {{- else -}}200{{- end}}
     {{- end -}}
     {{- end -}}
   {{- end -}}
