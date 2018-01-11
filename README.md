@@ -45,7 +45,8 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
 - traefik.path.prefix = < path >	       	# Path prefix rule. Multiple values separated by ","
 - traefik.path.prefix.strip = < path >	   	# Path prefix strip rule. Multiple values separated by ","
-- traefik.ratelimit.period = < ns >         # Replace n with desired amount of seconds in which traefik is checking the limits "average" and "burst", e.g. 10s
+- traefik.ratelimit.enable = < true | false >   # Enable/disabe rate-limiting based on client ip
+- traefik.ratelimit.period = < n >          # Replace n with desired amount of seconds in which traefik is checking the limits "average" and "burst", e.g. 10s
 - traefik.ratelimit.average = < n >         # Change to desired average allowed requests by client ip, e.g. 100
 - traefik.ratelimit.burst = < n >           # State what limit the client ip is allowed to burst up to respectively, e.g. 200
 
