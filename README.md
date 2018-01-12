@@ -40,7 +40,7 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.frontend.passHostHeader = < true | false > # Forward client Host header to the backend. Default `true`
 - traefik.weight = < weight >               # Override default backend weight 5
 - traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain is appended. WARNING: You could have collisions BE CAREFULL
-- traefik.alias.fqdn = < alias fqdn >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain must be defined but is not appended here.
+- traefik.alias.fqdn = < alias fqdn >		# Alternate names to route rule. Multiple values separated by ",". traefik.domain must be defined but is not appended here.
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
 - traefik.domain.regexp = < domain.regexp > # Domain name regexp rule. Multiple domains separated by ","
 - traefik.port = <port>						# port to expose throught traefik
@@ -49,6 +49,10 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
 - traefik.path.prefix = < path >	       	# Path prefix rule. Multiple values separated by ","
 - traefik.path.prefix.strip = < path >	   	# Path prefix strip rule. Multiple values separated by ","
+- traefik.ratelimit.enable = < true | false >   # Enable/disabe rate-limiting based on client ip
+- traefik.ratelimit.period = < n >          # Replace n with desired amount of seconds in which traefik is checking the limits "average" and "burst", e.g. 10s
+- traefik.ratelimit.average = < n >         # Change to desired average allowed requests by client ip, e.g. 100
+- traefik.ratelimit.burst = < n >           # State what limit the client ip is allowed to burst up to respectively, e.g. 200
 
 WARNING: Only services with healthy state are added to traefik, so health checks are mandatory.
 
