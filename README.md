@@ -32,19 +32,19 @@ Traefik labels, has to be created in your service or externalService, in order t
   - true: the service will be published as *service_name.stack_name.traefik_domain*
   - stack: the service will be published as *stack_name.domain*. WARNING: You can have collisions inside services within your stack
   - false: the service will not be published
-- traefik.priority = <priority>     	  	# Override for frontend priority. 5 by default
-- traefik.protocol = < http | https	>		# Override the default http protocol
-- traefik.sticky = < true | false	>		# Enable/disable sticky sessions to the backend
-- traefik.backend.loadbalancer.method = < drr | wrr > # Override default lb algorithm drr
+- traefik.priority = <priority>     	  	# Override for frontend priority. Default `5`
+- traefik.protocol = < http | https	>		# Override the default protocol `http`
+- traefik.sticky = < true | false	>		# Enable/disable sticky sessions to the backend. Default `false`
+- traefik.backend.loadbalancer.method = < drr | wrr > # Override default lb algorithm `drr`
 - traefik.backend.circuitbreaker.expression = < expression > # Override default backend circuitbreaker expression `NetworkErrorRatio() > 0.5`
 - traefik.frontend.passHostHeader = < true | false > # Forward client Host header to the backend. Default `true`
-- traefik.weight = < weight >               # Override default backend weight 5
+- traefik.weight = < weight >               # Override default backend weight `5`
 - traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain is appended. WARNING: You could have collisions BE CAREFULL
 - traefik.alias.fqdn = < alias fqdn >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain must be defined but is not appended here.
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
 - traefik.domain.regexp = < domain.regexp > # Domain name regexp rule. Multiple domains separated by ","
-- traefik.port = <port>						# port to expose throught traefik
-- traefik.acme = < true | false >			# Enable/disable ACME traefik feature
+- traefik.port = <port>						# port to expose throught traefik. Default `80`
+- traefik.acme = < true | false >			# Enable/disable ACME traefik feature. Default `false`
 - traefik.path = < path >		    		# Path rule. Multiple values separated by ","
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
 - traefik.path.prefix = < path >	       	# Path prefix rule. Multiple values separated by ","
