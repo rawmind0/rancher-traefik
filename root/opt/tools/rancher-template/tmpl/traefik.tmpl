@@ -169,6 +169,21 @@
         ;
       {{- end -}}
       "
+    {{- $traefik_ratelimit_enable := (index $service.Labels "traefik.ratelimit.enable") -}}
+    {{- if eq $traefik_ratelimit_enable "true" -}}
+        {{- $traefik_ratelimit_period := (index $service.Labels "traefik.ratelimit.period") -}}
+        {{- $traefik_ratelimit_average := (index $service.Labels "traefik.ratelimit.average") -}}
+        {{- $traefik_ratelimit_burst := (index $service.Labels "traefik.ratelimit.burst") }}
+  [frontends.{{$service.Name}}__{{$stack.Name}}.ratelimit]
+    extractorfunc = "client.ip"
+    [frontends.{{$service.Name}}__{{$stack.Name}}.ratelimit.rateset.rateset1]
+      period = {{if gt (len $traefik_ratelimit_period) 0 -}}"{{$traefik_ratelimit_period}}s"
+               {{- else -}} "10s"{{- end }}
+      average = {{if gt (len $traefik_ratelimit_average) 0 -}}{{$traefik_ratelimit_average}}
+                {{- else -}}100{{- end}}
+      burst = {{if gt (len $traefik_ratelimit_burst) 0}}{{$traefik_ratelimit_burst}}
+              {{- else -}}200{{- end}}
+    {{- end -}}
     {{- end -}}
   {{- end -}}
 {{- end}}
