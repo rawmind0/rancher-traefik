@@ -13,6 +13,7 @@ docker build -t rawmind/rancher-traefik:<version> .
 
 ## Versions
 
+- `1.5.0-0` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.5.0-0/Dockerfile) 
 - `1.4.4-6` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.4.4-6/Dockerfile) 
 - `1.3.6` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.3.6/Dockerfile)
 - `1.3.3-2` [(Dockerfile)](https://github.com/rawmind0/rancher-traefik/blob/1.3.3-2/Dockerfile)
@@ -49,10 +50,10 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
 - traefik.path.prefix = < path >	       	# Path prefix rule. Multiple values separated by ","
 - traefik.path.prefix.strip = < path >	   	# Path prefix strip rule. Multiple values separated by ","
-- traefik.ratelimit.enable = < true | false >   # Enable/disabe rate-limiting based on client ip
-- traefik.ratelimit.period = < n >          # Replace n with desired amount of seconds in which traefik is checking the limits "average" and "burst", e.g. 10s
-- traefik.ratelimit.average = < n >         # Change to desired average allowed requests by client ip, e.g. 100
-- traefik.ratelimit.burst = < n >           # State what limit the client ip is allowed to burst up to respectively, e.g. 200
+- traefik.ratelimit.enable = < true | false >   # Enable/disabe rate-limiting based on client ip. Default `false`
+- traefik.ratelimit.period = < n >          # Replace n with desired amount of seconds in which traefik is checking the limits "average" and "burst". Default `10`
+- traefik.ratelimit.average = < n >         # Change to desired average allowed requests by client ip. Default `100`
+- traefik.ratelimit.burst = < n >           # State what limit the client ip is allowed to burst up to respectively. Default `200`
 
 WARNING: Only services with healthy state are added to traefik, so health checks are mandatory.
 
