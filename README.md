@@ -44,7 +44,7 @@ Traefik labels have to be created in your `service` or `externalService` in orde
 - traefik.alias.fqdn = < alias fqdn >		# Alternate names to route rule. Multiple values separated by ",". `traefik.domain` must be defined but is not appended here
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
 - traefik.domain.regexp = < domain.regexp > # Domain name regexp rule. Multiple domains separated by ","
-- traefik.port = <port>						# Port to expose throught traefik. Default `80`
+- traefik.port = <port>						# Port to expose through traefik. Default `80`
 - traefik.acme = < true | false >			# Enable/disable ACME traefik feature. Default `false`
 - traefik.path = < path >		    		# Path rule. Multiple values separated by ","
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
