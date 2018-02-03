@@ -22,12 +22,12 @@ docker build -t rawmind/rancher-traefik:<version> .
 
 ## Usage
 
-This image has to be run as a sidekick of [rawmind/alpine-traefik][alpine-traefik], and makes available /opt/tools volume. It scans from rancher-metadata, looking for services and externalServices that has traefik labels, and generates traefik frontend and backends to expose the services.
+This image has to be run as a sidekick of [rawmind/alpine-traefik][alpine-traefik], and makes available `/opt/tools volume`. It scans from `rancher-metadata`, looking for `services` and `externalServices` that have traefik labels and generates traefik frontend and backends to expose the services.
 
 
 ## Configuration labels
 
-Traefik labels, has to be created in your service or externalService, in order to get included in traefik dynamic config.
+Traefik labels have to be created in your `service` or `externalService` in order to get included in traefik dynamic config.
 
 - traefik.enable = < true | stack | false > #Controls if you want to publish or not the service
   - true: the service will be published as *service_name.stack_name.traefik_domain*
@@ -40,11 +40,11 @@ Traefik labels, has to be created in your service or externalService, in order t
 - traefik.backend.circuitbreaker.expression = < expression > # Override default backend circuitbreaker expression `NetworkErrorRatio() > 0.5`
 - traefik.frontend.passHostHeader = < true | false > # Forward client Host header to the backend. Default `true`
 - traefik.weight = < weight >               # Override default backend weight `5`
-- traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain is appended. WARNING: You could have collisions BE CAREFULL
-- traefik.alias.fqdn = < alias fqdn >		# Alternate names to route rule. Multiple values separated by ",". traefik.domain must be defined but is not appended here.
+- traefik.alias = < alias >					# Alternate names to route rule. Multiple values separated by ",". traefik.domain is appended. WARNING: You could have collisions BE CAREFUL
+- traefik.alias.fqdn = < alias fqdn >		# Alternate names to route rule. Multiple values separated by ",". `traefik.domain` must be defined but is not appended here
 - traefik.domain = < domain.name >			# Domain names to route rules. Multiple domains separated by ","
 - traefik.domain.regexp = < domain.regexp > # Domain name regexp rule. Multiple domains separated by ","
-- traefik.port = <port>						# port to expose throught traefik. Default `80`
+- traefik.port = <port>						# Port to expose throught traefik. Default `80`
 - traefik.acme = < true | false >			# Enable/disable ACME traefik feature. Default `false`
 - traefik.path = < path >		    		# Path rule. Multiple values separated by ","
 - traefik.path.strip = < path >		       	# Path strip rule. Multiple values separated by ","
